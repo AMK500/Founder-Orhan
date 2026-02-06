@@ -1,0 +1,47 @@
+:root {
+  --clr-primary: #3498db;
+  --clr-secondary: #2ecc71;
+  --clr-gray: #7f8c8d;
+  --clr-white: white;
+  --clr-black: black;
+  --clr-red: red;
+  --clr-blue: blue;
+  --clr-yllow: #f1c40f;
+  --clr-green: green;
+  --clr-orange: #ff7700;
+}
+
+// #region colors classes
+
+.clr-primary {
+  color: var(--clr-primary);
+}
+.clr-secondary {
+  color: var(--clr-secondary);
+}
+.clr-white {
+  color: var(--clr-white);
+}
+.clr-black {
+  color: var(--clr-black);
+}
+.clr-red {
+  color: var(--clr-red);
+}
+.clr-yellow {
+  color: var(--clr-yllow);
+}
+.clr-orange {
+  color: var(--clr-orange);
+}
+.clr-blue {
+  color: var(--clr-blue);
+}
+.clr-green {
+  color: var(--clr-green);
+}
+.clr-gray {
+  color: var(--clr-gray);
+}
+
+// #endregion colors classes

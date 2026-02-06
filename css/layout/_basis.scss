@@ -1,0 +1,139 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+ul {
+  list-style-type: none;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+textarea {
+  resize: vertical;
+}
+
+ul,
+li,
+a,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  padding: 0;
+  margin: 0;
+}
+
+@mixin d-flex(
+  $align_items: null,
+  $justify: null,
+  $direction: null,
+  $wrap: null,
+  $gap: null
+) {
+  display: flex;
+
+  @if $align_items != null {
+    align-items: $align_items;
+  }
+
+  @if $justify != null {
+    justify-content: $justify;
+  }
+
+  @if $direction != null {
+    flex-direction: $direction;
+  }
+
+  @if $wrap != null {
+    flex-wrap: $wrap;
+  }
+
+  @if $gap != null {
+    gap: $gap;
+  }
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.row {
+  @include d-flex(center, center, row, wrap);
+}
+
+.d-flex {
+  @include d-flex();
+}
+
+$screens: (
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px,
+);
+
+@for $col from 1 through 12 {
+  .col-#{$col} {
+    padding: 0 1rem;
+    width: (100% / 12 * $col);
+  }
+}
+
+@each $screen, $width in $screens {
+  @media screen and (min-width: $width) {
+    @for $col from 1 through 12 {
+      .col-#{$screen}-#{$col} {
+        padding: 0 1rem;
+        width: (100% / 12 * $col);
+      }
+    }
+  }
+}
+
+html {
+  font-size: 16px;
+}
+
+// xl: ≥ xxl
+@media (max-width: 1199.98px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+// lg: ≥ 992px
+@media (max-width: 991.98px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+// md: ≥ 768px
+@media (max-width: 767.98px) {
+  html {
+    font-size: 13px;
+  }
+}
+
+// sm: ≥ 576px
+@media (max-width: 575.98px) {
+  html {
+    font-size: 12px;
+  }
+}
