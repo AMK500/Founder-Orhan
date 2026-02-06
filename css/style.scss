@@ -59,12 +59,16 @@ iframe {
   width: 100%;
 
   .nav-btn {
-    padding: 10px 20px;
+    width: 6.25rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: #3498db;
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 1rem;
     cursor: pointer;
     transition: background 0.3s ease;
     display: flex;
@@ -95,9 +99,10 @@ iframe {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100px;
-    height: 40px;
+    width: 6.25rem;
+    height: 2.5rem;
     background: #333;
+    font-size: 1rem;
     color: #fff;
     border-radius: 5px;
     cursor: pointer;
