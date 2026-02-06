@@ -525,8 +525,11 @@ iframe {
   padding: 10px 0;
 }
 .episodes-strip .episode-item {
-  flex: 0 0 auto;
-  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 40px;
   background: #333;
   color: #fff;
   border-radius: 5px;
