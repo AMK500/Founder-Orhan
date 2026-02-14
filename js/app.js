@@ -1,4 +1,25 @@
 // Mock Data for Seasons and Episodes
+const translations = {
+  ar: {
+    siteTitle: "المؤسس أورهان",
+    season: "الموسم",
+    episode: "الحلقة",
+    next: "التالي",
+    prev: "السابق",
+    langBtn: "English",
+  },
+  en: {
+    siteTitle: "Founder Orhan",
+    season: "Season",
+    episode: "Episode",
+    next: "Next",
+    prev: "Previous",
+    langBtn: "العربية",
+  },
+};
+
+let currentLang = localStorage.getItem("lang") || "ar";
+
 const seasons = [
   {
     id: 1,
@@ -69,6 +90,11 @@ const seasons = [
         title: "الحلقة 13",
         url: "https://qq.okprime.site/embed-r9vtaaal8gzq.html?autoplay=1&muted=1",
       },
+      {
+        id: 14,
+        title: "الحلقة 14",
+        url: "https://qq.okprime.site/embed-pmnz36mfvd87.html?autoplay=1&muted=1",
+      },
     ],
   },
   {
@@ -88,9 +114,13 @@ const nextBtn = document.getElementById("next-btn");
 const episodesStrip = document.getElementById("episodes-strip");
 const seasonsStrip = document.getElementById("seasons-strip");
 const episodeHeader = document.getElementById("episode-header");
+const langToggle = document.getElementById("lang-toggle");
+const langText = document.getElementById("lang-text");
 
 // Initialize
 function init() {
+  updateLanguage(currentLang); // Set initial language/direction
+
   const savedSeasonIndex = localStorage.getItem("lastSeasonIndex");
   const savedEpisodeIndex = localStorage.getItem("lastEpisodeIndex");
 
@@ -114,15 +144,80 @@ function init() {
   loadEpisode(currentEpisodeIndex, false); // false to avoid immediate scrolling on init if desired, but we handle scrolling inside
 }
 
+function updateLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem("lang", lang);
+  document.documentElement.lang = lang;
+  document.dir = lang === "ar" ? "rtl" : "ltr";
+
+  // Update static text
+  const t = translations[currentLang];
+  document.title = t.siteTitle;
+
+  // Update Buttons
+  // Note: Icons should swap position or just be consistent?
+  // In RTL: "Текст <icon>" (flex-row). In LTR: "Text <icon>" (flex-row).
+  // Current HTML: Text <i> for Next, <i> Text for Prev.
+  // We can update HTML innerHTML for buttons to match direction perfectly or just change text string if structure is simple.
+  // Next Btn: id="next-btn". innerHTML was `التالي <i class="..."></i>`
+  // Prev Btn: id="prev-btn". innerHTML was `<i class="..."></i> السابق`
+
+  const nextIcon = '<i class="fas fa-chevron-left"></i>';
+  const prevIcon = '<i class="fas fa-chevron-right"></i>';
+
+  if (lang === "ar") {
+    nextBtn.innerHTML = `${t.next} ${nextIcon}`;
+    prevBtn.innerHTML = `${prevIcon} ${t.prev}`;
+    langText.textContent = "English"; // Btn shows target language
+  } else {
+    // In English/LTR, Next is typically on the right with arrow pointing right >
+    // But here "Next" moves to next episode (sequence).
+    // Visual arrow: Next (Left arrow? No, typically Right arrow for next).
+    // Current Arabic: Next (Left Arrow) -> Logic: Next item in list?
+    // Let's stick to logical icons.
+    // Arabic: Next (Left in RTL is "Forward"?) No, usually Left is Back in RTL, Right is Forward.
+    // Wait, standard UI:
+    // RTL: Right -> Start, Left -> End.
+    // Next Episode -> usually "Left" direction?
+    // Let's keep the icons as they were for now to avoid confusion, or flip them if needed.
+    // Original: Next [Chevron Left]. Prev [Chevron Right].
+    // If RTL, Left = Flow direction?
+    // Let's just swap text and keep specific icons if they match the visual flow.
+    // English: Next text. Icon? usually Right >.
+    // Arabic: Next text. Icon? usually Left <.
+
+    // Let's simply update text and keep structure.
+    // For English:
+    nextBtn.innerHTML = `${t.next} <i class="fas fa-chevron-right"></i>`; // Standard LTR Next
+    prevBtn.innerHTML = `<i class="fas fa-chevron-left"></i> ${t.prev}`; // Standard LTR Prev
+    langText.textContent = "العربية";
+  }
+
+  renderSeasons();
+  renderEpisodes();
+
+  // Update Header if episode loaded
+  if (
+    seasons[currentSeasonIndex] &&
+    seasons[currentSeasonIndex].episodes[currentEpisodeIndex]
+  ) {
+    const season = seasons[currentSeasonIndex];
+    const episode = season.episodes[currentEpisodeIndex];
+    updateHeader(season.id, episode.id); // Passing IDs to generate title
+  }
+}
+
 // Render Seasons Strip
 function renderSeasons() {
   if (!seasonsStrip) return;
   seasonsStrip.innerHTML = "";
+  const t = translations[currentLang];
 
   seasons.forEach((season, index) => {
     const seasonEl = document.createElement("div");
     seasonEl.classList.add("season-item");
-    seasonEl.textContent = season.title;
+    // Generate Title
+    seasonEl.textContent = `${t.season} ${season.id}`;
 
     if (index === currentSeasonIndex) {
       seasonEl.classList.add("active");
@@ -157,12 +252,14 @@ function selectSeason(index) {
 // Render Episodes Strip
 function renderEpisodes() {
   episodesStrip.innerHTML = "";
-  const episodes = seasons[currentSeasonIndex].episodes;
+  const episodes = seasons[currentSeasonIndex]?.episodes || []; // Safety check
+  const t = translations[currentLang];
 
   episodes.forEach((episode, index) => {
     const episodeEl = document.createElement("div");
     episodeEl.classList.add("episode-item");
-    episodeEl.textContent = episode.title;
+    // Generate Title
+    episodeEl.textContent = `${t.episode} ${episode.id}`;
     if (index === currentEpisodeIndex) {
       episodeEl.classList.add("active");
     }
@@ -190,7 +287,7 @@ function loadEpisode(index, autoScroll = true) {
   videoFrame.src = episode.url;
 
   // Update Header
-  updateHeader(seasons[currentSeasonIndex].title, episode.title);
+  updateHeader(seasons[currentSeasonIndex].id, episode.id);
 
   // Update UI
   renderEpisodes();
@@ -209,8 +306,9 @@ function loadEpisode(index, autoScroll = true) {
   }
 }
 
-function updateHeader(seasonTitle, episodeTitle) {
-  const fullTitle = `المؤسس أورهان ${seasonTitle} : ${episodeTitle}`;
+function updateHeader(seasonId, episodeId) {
+  const t = translations[currentLang];
+  const fullTitle = `${t.siteTitle} ${t.season} ${seasonId} : ${t.episode} ${episodeId}`;
 
   if (episodeHeader) {
     episodeHeader.textContent = fullTitle;
@@ -238,6 +336,11 @@ nextBtn.addEventListener("click", () => {
   if (currentEpisodeIndex < episodes.length - 1) {
     loadEpisode(currentEpisodeIndex + 1);
   }
+});
+
+langToggle.addEventListener("click", () => {
+  const newLang = currentLang === "ar" ? "en" : "ar";
+  updateLanguage(newLang);
 });
 
 // Run Init
