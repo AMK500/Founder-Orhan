@@ -6,6 +6,8 @@ const translations = {
     episode: "الحلقة",
     next: "التالي",
     prev: "السابق",
+    share: "مشاركة",
+    copied: "تم نسخ الرابط!",
     langBtn: "English",
   },
   en: {
@@ -14,6 +16,8 @@ const translations = {
     episode: "Episode",
     next: "Next",
     prev: "Previous",
+    share: "Share",
+    copied: "Link copied!",
     langBtn: "العربية",
   },
 };
@@ -116,6 +120,7 @@ let currentEpisodeIndex = 0;
 const videoFrame = document.getElementById("video-frame");
 const prevBtn = document.getElementById("prev-btn");
 const nextBtn = document.getElementById("next-btn");
+const shareBtn = document.getElementById("share-btn");
 const episodesStrip = document.getElementById("episodes-strip");
 const seasonsStrip = document.getElementById("seasons-strip");
 const episodeHeader = document.getElementById("episode-header");
@@ -159,42 +164,19 @@ function updateLanguage(lang) {
   const t = translations[currentLang];
   document.title = t.siteTitle;
 
-  // Update Buttons
-  // Note: Icons should swap position or just be consistent?
-  // In RTL: "Текст <icon>" (flex-row). In LTR: "Text <icon>" (flex-row).
-  // Current HTML: Text <i> for Next, <i> Text for Prev.
-  // We can update HTML innerHTML for buttons to match direction perfectly or just change text string if structure is simple.
-  // Next Btn: id="next-btn". innerHTML was `التالي <i class="..."></i>`
-  // Prev Btn: id="prev-btn". innerHTML was `<i class="..."></i> السابق`
-
   const nextIcon = '<i class="fas fa-chevron-left"></i>';
   const prevIcon = '<i class="fas fa-chevron-right"></i>';
+  const shareIcon = '<i class="fas fa-share-nodes"></i>';
 
   if (lang === "ar") {
     nextBtn.innerHTML = `${t.next} ${nextIcon}`;
     prevBtn.innerHTML = `${prevIcon} ${t.prev}`;
+    shareBtn.innerHTML = `${t.share} ${shareIcon}`;
     langText.textContent = "English"; // Btn shows target language
   } else {
-    // In English/LTR, Next is typically on the right with arrow pointing right >
-    // But here "Next" moves to next episode (sequence).
-    // Visual arrow: Next (Left arrow? No, typically Right arrow for next).
-    // Current Arabic: Next (Left Arrow) -> Logic: Next item in list?
-    // Let's stick to logical icons.
-    // Arabic: Next (Left in RTL is "Forward"?) No, usually Left is Back in RTL, Right is Forward.
-    // Wait, standard UI:
-    // RTL: Right -> Start, Left -> End.
-    // Next Episode -> usually "Left" direction?
-    // Let's keep the icons as they were for now to avoid confusion, or flip them if needed.
-    // Original: Next [Chevron Left]. Prev [Chevron Right].
-    // If RTL, Left = Flow direction?
-    // Let's just swap text and keep specific icons if they match the visual flow.
-    // English: Next text. Icon? usually Right >.
-    // Arabic: Next text. Icon? usually Left <.
-
-    // Let's simply update text and keep structure.
-    // For English:
     nextBtn.innerHTML = `${t.next} <i class="fas fa-chevron-right"></i>`; // Standard LTR Next
     prevBtn.innerHTML = `<i class="fas fa-chevron-left"></i> ${t.prev}`; // Standard LTR Prev
+    shareBtn.innerHTML = `${t.share} ${shareIcon}`;
     langText.textContent = "العربية";
   }
 
@@ -245,12 +227,6 @@ function selectSeason(index) {
 
   renderSeasons();
   renderEpisodes();
-  // Optionally load the first episode of the new season automatically
-  // loadEpisode(0);
-  // User asked: "when I choose season it brings its episodes". Use renderEpisodes to show them.
-  // Assuming user wants to continue watching or pick one.
-  // But if we switched context, maybe we should update the player?
-  // Let's load the first episode of the new season to be safe/standard.
   loadEpisode(0);
 }
 
@@ -329,6 +305,34 @@ function updateButtons() {
   nextBtn.disabled = currentEpisodeIndex === episodes.length - 1;
 }
 
+async function handleShare() {
+  const t = translations[currentLang];
+  const season = seasons[currentSeasonIndex];
+  const episode = season.episodes[currentEpisodeIndex];
+  const shareTitle = `${t.siteTitle} - ${t.season} ${season.id} : ${t.episode} ${episode.id}`;
+  const shareUrl = episode.url;
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: shareTitle,
+        text: shareTitle,
+        url: shareUrl,
+      });
+    } catch (err) {
+      console.log("Error sharing:", err);
+    }
+  } else {
+    // Fallback: Copy to clipboard
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      alert(t.copied);
+    } catch (err) {
+      console.error("Failed to copy!", err);
+    }
+  }
+}
+
 // Event Listeners
 prevBtn.addEventListener("click", () => {
   if (currentEpisodeIndex > 0) {
@@ -342,6 +346,8 @@ nextBtn.addEventListener("click", () => {
     loadEpisode(currentEpisodeIndex + 1);
   }
 });
+
+shareBtn.addEventListener("click", handleShare);
 
 langToggle.addEventListener("click", () => {
   const newLang = currentLang === "ar" ? "en" : "ar";

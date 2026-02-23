@@ -156,6 +156,50 @@ iframe {
       opacity: 0.7;
     }
   }
+
+  .share-btn {
+    padding: 0 25px;
+    height: 2.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(39, 174, 96, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #2ecc71;
+    border: 1px solid rgba(46, 204, 113, 0.4);
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+
+    i {
+      font-size: 1.1rem;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover {
+      background: #27ae60;
+      color: #fff;
+      transform: translateY(-3px) scale(1.05);
+      border-color: #2ecc71;
+      box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4);
+
+      i {
+        transform: rotate(15deg);
+      }
+    }
+
+    &:active {
+      transform: translateY(0) scale(0.95);
+      box-shadow: 0 2px 10px rgba(39, 174, 96, 0.3);
+    }
+  }
 }
 
 .episodes-strip {
