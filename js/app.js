@@ -7,6 +7,10 @@ const translations = {
     next: "التالي",
     prev: "السابق",
     share: "مشاركة",
+    download: "تحميل",
+    resolving: "جاري تجهيز الرابط...",
+    downloadError: "فشل استخراج رابط التحميل",
+    serverError: "تأكد من تشغيل ملف server.js في مجلد resolver-api",
     copied: "تم نسخ الرابط!",
     langBtn: "English",
   },
@@ -17,6 +21,10 @@ const translations = {
     next: "Next",
     prev: "Previous",
     share: "Share",
+    download: "Download",
+    resolving: "Resolving link...",
+    downloadError: "Failed to resolve download link",
+    serverError: "Make sure server.js is running in resolver-api folder",
     copied: "Link copied!",
     langBtn: "العربية",
   },
@@ -121,6 +129,7 @@ const videoFrame = document.getElementById("video-frame");
 const prevBtn = document.getElementById("prev-btn");
 const nextBtn = document.getElementById("next-btn");
 const shareBtn = document.getElementById("share-btn");
+const downloadBtn = document.getElementById("download-btn");
 const episodesStrip = document.getElementById("episodes-strip");
 const seasonsStrip = document.getElementById("seasons-strip");
 const episodeHeader = document.getElementById("episode-header");
@@ -172,11 +181,13 @@ function updateLanguage(lang) {
     nextBtn.innerHTML = `${t.next} ${nextIcon}`;
     prevBtn.innerHTML = `${prevIcon} ${t.prev}`;
     shareBtn.innerHTML = `${t.share} ${shareIcon}`;
+    downloadBtn.innerHTML = `${t.download} <i class="fas fa-download"></i>`;
     langText.textContent = "English"; // Btn shows target language
   } else {
     nextBtn.innerHTML = `${t.next} <i class="fas fa-chevron-right"></i>`; // Standard LTR Next
     prevBtn.innerHTML = `<i class="fas fa-chevron-left"></i> ${t.prev}`; // Standard LTR Prev
     shareBtn.innerHTML = `${t.share} ${shareIcon}`;
+    downloadBtn.innerHTML = `${t.download} <i class="fas fa-download"></i>`;
     langText.textContent = "العربية";
   }
 
@@ -239,8 +250,25 @@ function renderEpisodes() {
   episodes.forEach((episode, index) => {
     const episodeEl = document.createElement("div");
     episodeEl.classList.add("episode-item");
-    // Generate Title
-    episodeEl.textContent = `${t.episode} ${episode.id}`;
+
+    // Container for text
+    const textSpan = document.createElement("span");
+    textSpan.textContent = `${t.episode} ${episode.id}`;
+    episodeEl.appendChild(textSpan);
+
+    // Mini Download Button
+    const miniDownloadBtn = document.createElement("button");
+    miniDownloadBtn.classList.add("mini-download-btn");
+    miniDownloadBtn.innerHTML = '<i class="fas fa-download"></i>';
+    miniDownloadBtn.title = t.download;
+
+    miniDownloadBtn.addEventListener("click", (e) => {
+      e.stopPropagation(); // Prevent loading the episode in player
+      handleDownload(index);
+    });
+
+    episodeEl.appendChild(miniDownloadBtn);
+
     if (index === currentEpisodeIndex) {
       episodeEl.classList.add("active");
     }
@@ -333,6 +361,61 @@ async function handleShare() {
   }
 }
 
+async function handleDownload(forcedIndex = null) {
+  const t = translations[currentLang];
+  const downloadIdx = forcedIndex !== null ? forcedIndex : currentEpisodeIndex;
+  const episode = seasons[currentSeasonIndex].episodes[downloadIdx];
+
+  // Decide which button to show loading on
+  let targetBtn = downloadBtn;
+  if (forcedIndex !== null) {
+    // If called from the list, find the mini button in that episode element
+    targetBtn =
+      episodesStrip.children[downloadIdx].querySelector(".mini-download-btn");
+  }
+
+  const originalContent = targetBtn.innerHTML;
+
+  try {
+    // Show loading state
+    targetBtn.disabled = true;
+    if (forcedIndex !== null) {
+      targetBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    } else {
+      targetBtn.innerHTML = `${t.resolving} <i class="fas fa-spinner fa-spin"></i>`;
+    }
+
+    // Call Backend Resolver (Localhost by default)
+    const response = await fetch(
+      `http://localhost:3000/resolve?url=${encodeURIComponent(episode.url)}`,
+    );
+    const data = await response.json();
+
+    if (data.url) {
+      // Trigger automatic download
+      const a = document.createElement("a");
+      a.href = data.url;
+      a.download = `${t.siteTitle} - S${seasons[currentSeasonIndex].id}E${episode.id}.mp4`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else {
+      throw new Error(data.error || "No URL returned");
+    }
+  } catch (err) {
+    console.error("Download error:", err);
+    if (err.message.includes("Failed to fetch") || err.name === "TypeError") {
+      alert(t.serverError);
+    } else {
+      alert(t.downloadError + ": " + err.message);
+    }
+  } finally {
+    // Restore button state
+    targetBtn.disabled = false;
+    targetBtn.innerHTML = originalContent;
+  }
+}
+
 // Event Listeners
 prevBtn.addEventListener("click", () => {
   if (currentEpisodeIndex > 0) {
@@ -348,6 +431,7 @@ nextBtn.addEventListener("click", () => {
 });
 
 shareBtn.addEventListener("click", handleShare);
+downloadBtn.addEventListener("click", handleDownload);
 
 langToggle.addEventListener("click", () => {
   const newLang = currentLang === "ar" ? "en" : "ar";
