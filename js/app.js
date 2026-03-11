@@ -108,7 +108,7 @@ const seasons = [
       {
         id: 17,
         title: "الحلقة 17",
-        url: "https://qq.okprime.site/embed-annizn3sbf1z.html",
+        url: "https://vidoba.org/embed-ghe5w6dfd2fy.html",
       },
     ],
   },
