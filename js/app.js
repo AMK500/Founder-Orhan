@@ -105,6 +105,11 @@ const seasons = [
         title: "الحلقة 16",
         url: "https://qq.okprime.site/embed-3gnucd3sd1oj.html",
       },
+      {
+        id: 17,
+        title: "الحلقة 17",
+        url: "https://qq.okprime.site/embed-annizn3sbf1z.html",
+      },
     ],
   },
   {
