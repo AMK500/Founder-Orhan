@@ -110,6 +110,11 @@ const seasons = [
         title: "الحلقة 17",
         url: "https://vidoba.org/embed-ghe5w6dfd2fy.html",
       },
+      {
+        id: 18,
+        title: "الحلقة 18",
+        url: "https://vidoba.org/embed-o88ojund7d3e.html",
+      },
     ],
   },
   {
