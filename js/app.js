@@ -115,6 +115,11 @@ const seasons = [
         title: "الحلقة 18",
         url: "https://vidoba.org/embed-o88ojund7d3e.html",
       },
+      {
+        id: 19,
+        title: "الحلقة 19",
+        url: "https://ok.okprime.site/embed-jo3i082t2wp5.html",
+      },
     ],
   },
   {
