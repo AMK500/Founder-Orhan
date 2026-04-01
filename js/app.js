@@ -103,7 +103,7 @@ const seasons = [
       {
         id: 16,
         title: "الحلقة 16",
-        url: "https://qq.okprime.site/embed-3gnucd3sd1oj.html",
+        url: "https://vidoba.org/embed-hqmdep4j9s6r.html",
       },
       {
         id: 17,
@@ -118,7 +118,12 @@ const seasons = [
       {
         id: 19,
         title: "الحلقة 19",
-        url: "https://ok.okprime.site/embed-jo3i082t2wp5.html",
+        url: "https://vidoba.org/embed-yjkgv8ldyteb.html",
+      },
+      {
+        id: 20,
+        title: "الحلقة 20",
+        url: "https://vidoba.org/embed-etoltp1lrnd2.html",
       },
     ],
   },
