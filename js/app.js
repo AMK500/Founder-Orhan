@@ -125,6 +125,11 @@ const seasons = [
         title: "الحلقة 20",
         url: "https://vidoba.org/embed-etoltp1lrnd2.html",
       },
+      {
+        id: 21,
+        title: "الحلقة 21",
+        url: "https://vidoba.org/embed-8evofrfxlp9a.html",
+      },
     ],
   },
   {
